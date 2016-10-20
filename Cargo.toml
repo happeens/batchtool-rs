@@ -1,0 +1,8 @@
+[package]
+name = "batchtool-rs"
+version = "0.1.0"
+authors = ["happeens <hilmar.wiegand@flameshome.net>"]
+
+[dependencies]
+clap = "~2.14.0"
+image = "*"
