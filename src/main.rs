@@ -48,7 +48,12 @@ fn main() {
         }
     }
 
+    for image in &mut images {
+        image.trim();
+    }
+
     let output_name = matches.value_of("OUTPUT").unwrap();
+    images[0].draw_bounds();
     images[0].save("test.png");
     println!("output: {}", output_name);
 
