@@ -31,11 +31,16 @@ pub struct Img {
 
 impl Img {
     pub fn from_file(path: &str) -> Img {
-        let img = image::open(&Path::new(path)).unwrap();
+        let path = Path::new(path);
+        let img = image::open(&path).unwrap();
         let dim = img.dimensions();
+        let filename = String::from(path.file_stem().unwrap().to_str().unwrap());
+
+        // DEBUG
+        println!("name found: {}", filename);
 
         Img {
-            name: String::from(path),
+            name: filename,
             size: Size {width: dim.0, height: dim.1},
             o_size: Size {width: dim.0, height: dim.1},
             bounds: Rect {
@@ -45,6 +50,27 @@ impl Img {
             pos: Pos {x: 0u32, y: 0u32},
             offset: Pos {x: 0u32, y: 0u32},
             data: img
+        }
+    }
+
+    pub fn trim(&mut self) {
+        println!("pixel at 0, 0: {:?}", self.data.get_pixel(20u32, 20u32));
+
+        // find empty rows at top
+        let mut top_rows = 0u32;
+        let mut empty = true;
+        let mut y = 0;
+        while empty && y < self.size.height {
+            for x in 0..self.size.width {
+                if self.data.get_pixel(x, y).data[3] != 0 {
+                    empty = false;
+                    top_rows = y - 1;
+                    println!("visible pixel found at {}, {}", x, y);
+                    break;
+                }
+            }
+
+            y += 1;
         }
     }
 

@@ -41,7 +41,6 @@ fn main() {
     let files: Vec<_> = matches.values_of("SOURCES").unwrap().collect();
     let mut images: Vec<_> = Vec::new();
     for file in &files {
-        println!("file: {}", file);
         images.push(Img::from_file(&file));
         if matches.is_present("trim") {
             println!("trimming");
@@ -49,6 +48,7 @@ fn main() {
     }
 
     let output_name = matches.value_of("OUTPUT").unwrap();
+    images[0].trim();
     images[0].save("test.png");
     println!("output: {}", output_name);
 
