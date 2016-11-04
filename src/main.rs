@@ -2,9 +2,11 @@
 extern crate clap;
 
 mod img;
+mod batch;
 
 use clap::{App, Arg};
 use img::Img;
+use batch::Batch;
 
 fn main() {
     let matches = App::new("batchtool-rs")
@@ -47,13 +49,7 @@ fn main() {
         }
     }
 
-    for image in &mut images {
-        image.trim();
-    }
-
+    let batch = Batch::from_vec(images);
     let output_name = matches.value_of("OUTPUT").unwrap();
-    images[0].save("test.png");
-    println!("output: {}", output_name);
-
-    println!("done.");
+    batch.save(output_name);
 }
