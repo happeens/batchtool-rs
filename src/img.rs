@@ -46,27 +46,6 @@ impl Img {
         }
     }
 
-    pub fn trim(&mut self) {
-        println!("pixel at 0, 0: {:?}", self.data.get_pixel(20u32, 20u32));
-
-        // find empty rows at top
-        let mut top_rows = 0u32;
-        let mut empty = true;
-        let mut y = 0;
-        while empty && y < self.size.height {
-            for x in 0..self.size.width {
-                if self.data.get_pixel(x, y).data[3] != 0 {
-                    empty = false;
-                    top_rows = y - 1;
-                    println!("visible pixel found at {}, {}", x, y);
-                    break;
-                }
-            }
-
-            y += 1;
-        }
-    }
-
     pub fn save(&self, path: &str) {
         let path = Path::new(path);
         let _ = self.pixels.save(&path);
