@@ -4,32 +4,51 @@ extern crate std;
 use std::path::Path;
 use std::fs::File;
 use self::image::{RgbaImage, imageops, DynamicImage, Rgba};
+use std::cmp::Ordering;
 
-struct Pos {
-    x: u32,
-    y: u32
+#[derive(Debug, Clone)]
+pub struct Pos {
+    pub x: u32,
+    pub y: u32
 }
 
-struct Size {
-    width: u32,
-    height: u32
+impl Pos {
+    pub fn cmp(&self, pos: &Pos) -> Ordering {
+        (self.x.pow(4) + self.y.pow(4)).cmp(&(pos.x.pow(4) + pos.y.pow(4)))
+    }
 }
 
-struct Rect {
-    pos: Pos,
-    size: Size
+#[derive(Debug, Clone)]
+pub struct Size {
+    pub width: u32,
+    pub height: u32
 }
 
+#[derive(Clone)]
 pub struct Img {
-    name: String,
-    size: Size,
-    o_size: Size,
-    pos: Pos,
-    offset: Pos,
-    pixels: RgbaImage
+    pub name: String,
+    pub size: Size,
+    pub o_size: Size,
+    pub pos: Pos,
+    pub offset: Pos,
+    pub pixels: RgbaImage
 }
 
 impl Img {
+    pub fn new(name: &str, width: u32, height: u32) -> Img {
+        let img = RgbaImage::new(width, height);
+        let dim = img.dimensions();
+
+        Img {
+            name: String::from(name),
+            size: Size {width: dim.0, height: dim.1},
+            o_size: Size {width: dim.0, height: dim.1},
+            pos: Pos {x: 0u32, y: 0u32},
+            offset: Pos {x: 0u32, y: 0u32},
+            pixels: img
+        }
+    }
+
     pub fn from_file(path: &str) -> Img {
         let path = Path::new(path);
         let img: RgbaImage = image::open(&path).unwrap().to_rgba();
@@ -44,6 +63,25 @@ impl Img {
             offset: Pos {x: 0u32, y: 0u32},
             pixels: img
         }
+    }
+    
+    pub fn insert(&mut self, img: Img, pos: Pos) {
+        if self.size.width < img.size.width
+           || self.size.height < img.size.height {
+               println!("image too big to insert");
+               return;
+           }
+
+        for y in 0..img.size.height {
+            for x in 0..img.size.width {
+                self.pixels.put_pixel(x + pos.x, y + pos.y,
+                                      img.pixels.get_pixel(x, y).clone());
+            }
+        }
+    }
+
+    pub fn cmp(&self, img: &Img) -> Ordering {
+        (self.size.width * self.size.height).cmp(&(self.size.width * self.size.height))
     }
 
     pub fn save(&self, path: &str) {

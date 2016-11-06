@@ -7,6 +7,7 @@ mod batch;
 use clap::{App, Arg};
 use img::Img;
 use batch::Batch;
+use batch::builder::BatchBuilder;
 
 fn main() {
     let matches = App::new("batchtool-rs")
@@ -44,12 +45,15 @@ fn main() {
     let mut images: Vec<_> = Vec::new();
     for file in &files {
         images.push(Img::from_file(&file));
-        if matches.is_present("trim") {
-            println!("trimming");
-        }
     }
 
-    let batch = Batch::from_vec(images);
+    let mut batch = BatchBuilder::new(images)
+        //TODO: strategy
+        .trim_images(matches.is_present("trim"))
+        .pow_output(matches.is_present("pow"))
+        //TODO: format
+        .finalize();
+
     let output_name = matches.value_of("OUTPUT").unwrap();
-    batch.save(output_name);
+    batch.pack().save(output_name);
 }
