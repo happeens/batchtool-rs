@@ -51,6 +51,7 @@ fn main() {
         //TODO: strategy
         .trim_images(matches.is_present("trim"))
         .pow_output(matches.is_present("pow"))
+        .draw_bounds(matches.is_present("bounds"))
         //TODO: format
         .finalize();
 

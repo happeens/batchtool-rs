@@ -34,7 +34,7 @@ impl Batch {
         }
 
         // sort images by size
-        self.images.sort_by(|a, b| a.cmp(b));
+        self.images.sort_by(|a, b| b.cmp(a));
 
         let mut free_anchors = Vec::<Pos>::new();
         let mut abs_anchors = Vec::<Pos>::new();
@@ -57,31 +57,41 @@ impl Batch {
             };
 
             // still finding new anchors
-            if free_anchors.len() > 3 {
-                for i in 1..(free_anchors.len() - 1) {
-                    let mut first = free_anchors.first().unwrap().clone();
-                    if free_anchors[i].x >= first.x &&
-                       free_anchors[i].x <= new_anchor_right.x {
-                           new_anchor_right.y = cmp::min(new_anchor_right.y,
-                                                         free_anchors[i].y);
-                           free_anchors.remove(i);
-                           continue;
-                    }
+            for i in 1..(free_anchors.len() - 1) {
+                let first = free_anchors.first().unwrap().clone();
 
-                    if free_anchors[i].y >= first.y &&
-                       free_anchors[i].y <= new_anchor_bot.y {
-                           new_anchor_bot.x = cmp::min(new_anchor_bot.y,
-                                                       free_anchors[i].y);
-                           free_anchors.remove(i);
-                           continue;
-                    }
+                // if we removed an anchor before, we might
+                // go out of bounds
+                if i >= free_anchors.len() {
+                    break;
                 }
+
+                if free_anchors[i].x >= first.x &&
+                   free_anchors[i].x <= new_anchor_right.x {
+                       new_anchor_right.y = cmp::min(new_anchor_right.y,
+                                                     free_anchors[i].y);
+                       free_anchors.remove(i);
+                       continue;
+                }
+
+                if free_anchors[i].y >= first.y &&
+                   free_anchors[i].y <= new_anchor_bot.y {
+                       new_anchor_bot.x = cmp::min(new_anchor_bot.x,
+                                                   free_anchors[i].x);
+                       free_anchors.remove(i);
+                       continue;
+                }
+
             }
 
             // remove first, add new anchors
             free_anchors.remove(0);
-            free_anchors.push(new_anchor_right);
-            free_anchors.push(new_anchor_bot);
+            if !free_anchors.contains(&new_anchor_right) {
+                free_anchors.push(new_anchor_right);
+            }
+            if !free_anchors.contains(&new_anchor_bot) {
+                free_anchors.push(new_anchor_bot);
+            }
 
             free_anchors.sort_by(|a, b| a.cmp(b));
         }

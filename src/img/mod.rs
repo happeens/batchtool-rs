@@ -5,6 +5,8 @@ use std::path::Path;
 use std::fs::File;
 use self::image::{RgbaImage, imageops, DynamicImage, Rgba};
 use std::cmp::Ordering;
+use std::cmp::PartialEq;
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Pos {
@@ -16,12 +18,31 @@ impl Pos {
     pub fn cmp(&self, pos: &Pos) -> Ordering {
         (self.x.pow(4) + self.y.pow(4)).cmp(&(pos.x.pow(4) + pos.y.pow(4)))
     }
+
+}
+
+impl PartialEq for Pos {
+    fn eq(&self, other: &Self) -> bool {
+        (self.x, self.y) == (other.x, other.y)
+    }
+}
+
+impl fmt::Display for Pos {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct Size {
     pub width: u32,
     pub height: u32
+}
+
+impl fmt::Display for Size {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.width, self.height)
+    }
 }
 
 #[derive(Clone)]
@@ -81,7 +102,7 @@ impl Img {
     }
 
     pub fn cmp(&self, img: &Img) -> Ordering {
-        (self.size.width * self.size.height).cmp(&(self.size.width * self.size.height))
+        (self.size.width * self.size.height).cmp(&(img.size.width * img.size.height))
     }
 
     pub fn save(&self, path: &str) {
